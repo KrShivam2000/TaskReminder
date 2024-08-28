@@ -1,6 +1,4 @@
 package com.reminder.task.dto;
-
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;

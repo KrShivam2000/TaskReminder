@@ -3,8 +3,6 @@ package com.reminder.task.controller;
 import com.reminder.task.dto.ReminderRequestDto;
 import com.reminder.task.entity.Reminder;
 
-import com.reminder.task.entity.Task;
-import com.reminder.task.mapper.ReminderMapper;
 import com.reminder.task.service.ReminderService;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @Slf4j

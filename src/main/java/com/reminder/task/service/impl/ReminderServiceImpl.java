@@ -2,7 +2,6 @@ package com.reminder.task.service.impl;
 
 import com.reminder.task.dao.ReminderRepository;
 import com.reminder.task.entity.Reminder;
-import com.reminder.task.entity.Task;
 import com.reminder.task.service.ReminderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,7 @@ public class ReminderServiceImpl implements ReminderService {
             updatedReminder.setMessage(reminder.getMessage());
             return reminderRepository.save(updatedReminder);
         }
-        return null;
+        return null; // Or throw an exception
     }
 
     @Override
@@ -40,7 +39,7 @@ public class ReminderServiceImpl implements ReminderService {
 
     @Override
     public Reminder getReminderById(Long id) {
-        return reminderRepository.findById(id).orElse(null);
+        return reminderRepository.findById(id).orElse(null); // Or throw an exception
     }
 
     @Override
