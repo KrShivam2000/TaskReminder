@@ -32,7 +32,7 @@ public class TaskServiceImpl implements TaskService {
             updatedTask.setDueDate(task.getDueDate());
             return taskRepository.save(updatedTask);
         }
-        return null; // Or throw an exception
+        return null;
     }
 
     @Override

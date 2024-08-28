@@ -1,8 +1,12 @@
 package com.reminder.task.controller;
 
+import com.reminder.task.dto.ReminderRequestDto;
 import com.reminder.task.entity.Reminder;
 
+import com.reminder.task.entity.Task;
+import com.reminder.task.mapper.ReminderMapper;
 import com.reminder.task.service.ReminderService;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,58 +16,78 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
+@Slf4j
 @RequestMapping("/reminders")
 public class ReminderController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ReminderController.class);
 
     @Autowired
     private ReminderService reminderService;
 
     @PostMapping
-    public ResponseEntity<Reminder> createReminder(@RequestBody Reminder reminder) {
+    public ResponseEntity<ReminderRequestDto> createReminder(@RequestBody Reminder reminder) {
         Reminder createdReminder = reminderService.createReminder(reminder);
-        logger.info("Reminder created successfully with ID: {}", createdReminder.getId());
-        return new ResponseEntity<>(createdReminder, HttpStatus.CREATED);
+        log.info("reminder with id: {} created successfully ", createdReminder.getId());
+        return new ResponseEntity<>(createdReminder.toDto(), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Reminder> updateReminder(@PathVariable Long id, @RequestBody Reminder reminder) {
+    public ResponseEntity<ReminderRequestDto> updateReminder(@PathVariable Long id, @RequestBody Reminder reminder) {
         Reminder updatedReminder = reminderService.updateReminder(id, reminder);
         if (updatedReminder != null) {
-            return new ResponseEntity<>(updatedReminder, HttpStatus.OK);
+            log.info("reminder id: {} updated",id);
+            return new ResponseEntity<>(updatedReminder.toDto(), HttpStatus.OK);
         } else {
+            log.warn("reminder id: {} not found",id);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReminder(@PathVariable Long id) {
-        reminderService.deleteReminder(id);
-        logger.info("Reminder deleted successfully with ID: {}", id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        Reminder reminder = reminderService.getReminderById(id);
+        if (reminder != null){
+            reminderService.deleteReminder(id);
+            log.info("reminder with id: {} deleted successfully ", id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            log.warn("reminder with id: {} not present", id);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Reminder> getReminderById(@PathVariable Long id) {
-        logger.info("Fetching reminder with ID: {}", id);
+    public ResponseEntity<ReminderRequestDto> getReminderById(@PathVariable Long id) {
+        log.info("fetching reminder with id: {}", id);
         Reminder reminder = reminderService.getReminderById(id);
         if (reminder != null) {
-            logger.info("Reminder found with ID: {}", id);
-            return new ResponseEntity<>(reminder, HttpStatus.OK);
+            log.info("reminder with id: {} found ", id);
+            return new ResponseEntity<>(reminder.toDto(), HttpStatus.OK);
         } else {
-            logger.warn("Reminder with ID: {} not found", id);
+            log.warn("reminder with id: {} not found", id);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @GetMapping("/task/{taskId}")
-    public ResponseEntity<List<Reminder>> getRemindersByTaskId(@PathVariable Long taskId) {
-        logger.info("Fetching reminders for task ID: {}", taskId);
+    public ResponseEntity<List<ReminderRequestDto>> getRemindersByTaskId(@PathVariable Long taskId) {
+        log.info("fetching reminders for task id: {}", taskId);
         List<Reminder> reminders = reminderService.getRemindersByTaskId(taskId);
-        logger.info("Total reminders found for task ID {}: {}", taskId, reminders.size());
-        return new ResponseEntity<>(reminders, HttpStatus.OK);
+        log.info("total reminders found for task id {}: {}", taskId, reminders.size());
+        List<ReminderRequestDto> reminderRequestDtoList= reminders.stream().map(Reminder::toDto).toList();
+        return new ResponseEntity<>(reminderRequestDtoList, HttpStatus.OK);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<ReminderRequestDto>> getAllTasks() {
+        List<Reminder> reminders = reminderService.getAllTasks();
+        List<ReminderRequestDto> reminderRequestDtoList = reminders.stream()
+                .map(Reminder::toDto)
+                .toList();
+        log.info("total reminders found: {}",reminderRequestDtoList.size());
+        return new ResponseEntity<>(reminderRequestDtoList, HttpStatus.OK);
     }
 }
