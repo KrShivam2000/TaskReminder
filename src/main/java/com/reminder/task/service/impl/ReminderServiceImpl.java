@@ -46,4 +46,9 @@ public class ReminderServiceImpl implements ReminderService {
     public List<Reminder> getRemindersByTaskId(Long taskId) {
         return reminderRepository.findByTaskId(taskId);
     }
+
+    @Override
+    public List<Reminder> getAllTasks() {
+        return reminderRepository.findAll();
+    }
 }
